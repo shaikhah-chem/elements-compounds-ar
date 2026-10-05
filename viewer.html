@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>العناصر والمركبات – عرض ثلاثي الأبعاد</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="vendor/aframe-v1.5.0.min.js"></script>
+<script src="js/molecules.js"></script>
+<script src="js/app.js"></script>
+<style>body{background:#0b2545}</style>
+</head>
+<body>
+<div id="top" class="ui"><h1>عرض ثلاثي الأبعاد ⚛</h1><span id="score">صنّفتِ 0 / 4</span></div>
+<div class="ui vtabs" id="tabs">
+  <button data-i="0">H₂</button><button data-i="1">O₂</button><button data-i="2">H₂O</button><button data-i="3">NaCl</button>
+</div>
+<div id="panel" class="ui">
+  <div class="row"><div id="p-f"></div><div id="p-name"></div><button id="mini" aria-label="تصغير">▾</button></div>
+  <div class="q">صنّفي المادة: عنصر أم مركّب؟</div>
+  <div class="btns"><button class="ans" data-t="عنصر">عنصر</button><button class="ans" data-t="مركب">مركّب</button></div>
+  <div id="fb" class="fb"></div>
+  <div id="extra"></div>
+</div>
+<div id="win" class="ui"><div><b>🎉 أحسنتِ!</b><br>صنّفتِ المواد الأربع.<br>العنصر: نوع واحد من الذرات.<br>المركب: عنصران أو أكثر متحدان كيميائياً.</div></div>
+<div class="credit">أ. شيخة المطيري</div>
+
+<a-scene id="scene" background="color: #0b2545" vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true" loading-screen="enabled: false">
+  <a-entity camera position="0 0.15 1.25"></a-entity>
+  <a-entity light="type: ambient; intensity: 0.7"></a-entity>
+  <a-entity light="type: directional; intensity: 0.9" position="0.5 1 1.5"></a-entity>
+  <a-entity id="h0" position="0 0.42 0" scale="1.5 1.5 1.5"></a-entity>
+  <a-entity id="h1" position="0 0.42 0" scale="1.5 1.5 1.5" visible="false"></a-entity>
+  <a-entity id="h2" position="0 0.42 0" scale="1.5 1.5 1.5" visible="false"></a-entity>
+  <a-entity id="h3" position="0 0.42 0" scale="1.5 1.5 1.5" visible="false"></a-entity>
+</a-scene>
+<script>
+(function () {
+  const scene = document.getElementById('scene');
+  let W, N;
+  function build() {
+    MOL.diatomic(document.getElementById('h0'), 'H', false);
+    MOL.diatomic(document.getElementById('h1'), 'O', true);
+    W = MOL.water(document.getElementById('h2'));
+    N = MOL.nacl(document.getElementById('h3'));
+    window.AR_HOOKS = { electrolysis: cb => W.electrolysis(cb), resetWater: () => W.reset(), lattice: on => N.showLattice(on) };
+    show(0);
+  }
+  function show(i) {
+    for (let k = 0; k < 4; k++) document.getElementById('h' + k).setAttribute('visible', k === i);
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
+    if (i === 2) W.reset(); if (i === 3) N.showLattice(false);
+    APP.render(i);
+  }
+  document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => show(+b.dataset.i)));
+  if (scene.hasLoaded) build(); else scene.addEventListener('loaded', build);
+})();
+</script>
+</body>
+</html>
